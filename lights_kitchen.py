@@ -8,6 +8,7 @@
 import time
 from neopixel import *
 import argparse
+import random
 
 # LED strip configuration:
 LED_COUNT      = 300      # Number of LED pixels.
@@ -59,6 +60,19 @@ def rainbow(strip, wait_ms=20, iterations=1):
         strip.show()
         time.sleep(wait_ms/1000.0)
 
+def candle(strip, wait_ms=20, iterations=5):
+    """Draw a random effect that looks like candles"""
+    gfixed = 160
+    bfixed = 84
+    for j in range(256*iterations):
+        for i in range(strip.numPixels()):
+            gdev = random.randint(1,110)-55
+            bdev = random.randint(1,168)-84
+            for k in range(25):
+                strip.setPixelColor(i+k, Color(255, gfixed + (gdev/25)*k, bfixed + (bdev/25)*k)
+        strip.show()
+        time.sleep(wait_ms/1000.0)
+
 def rainbowCycle(strip, wait_ms=20, iterations=5):
     """Draw rainbow that uniformly distributes itself across all pixels."""
     for j in range(256*iterations):
@@ -97,18 +111,20 @@ if __name__ == '__main__':
     try:
 
         while True:
-            print ('Color wipe animations.')
-            colorWipe(strip, Color(255, 0, 0))  # Red wipe
-            colorWipe(strip, Color(0, 255, 0))  # Blue wipe
-            colorWipe(strip, Color(0, 0, 255))  # Green wipe
-            print ('Theater chase animations.')
-            theaterChase(strip, Color(127, 127, 127))  # White theater chase
-            theaterChase(strip, Color(127,   0,   0))  # Red theater chase
-            theaterChase(strip, Color(  0,   0, 127))  # Blue theater chase
+            #print ('Color wipe animations.')
+            #colorWipe(strip, Color(255, 0, 0))  # Red wipe
+            #colorWipe(strip, Color(0, 255, 0))  # Blue wipe
+            #colorWipe(strip, Color(0, 0, 255))  # Green wipe
+            #print ('Theater chase animations.')
+            #theaterChase(strip, Color(127, 127, 127))  # White theater chase
+            #theaterChase(strip, Color(127,   0,   0))  # Red theater chase
+            #theaterChase(strip, Color(  0,   0, 127))  # Blue theater chase
+            print ('candle animation')
+            candle(strip)
             print ('Rainbow animations.')
             rainbow(strip)
-            rainbowCycle(strip)
-            theaterChaseRainbow(strip)
+            #rainbowCycle(strip)
+            #theaterChaseRainbow(strip)
 
     except KeyboardInterrupt:
         if args.clear:
