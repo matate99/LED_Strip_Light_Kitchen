@@ -69,7 +69,8 @@ def candle(strip, wait_ms=20, iterations=5):
             gdev = random.randint(1,110)-55
             bdev = random.randint(1,168)-84
             for k in range(25):
-                strip.setPixelColor(i+k, Color(255, gfixed + (gdev/25)*k, bfixed + (bdev/25)*k)
+                strip.setPixelColor(i+k, Color(255, gfixed + (gdev/25)*k, bfixed + (bdev/25)*k) & 255)
+                print( str(Color(255, gfixed + (gdev/25)*k, bfixed + (bdev/25)*k) & 255) + ' ' + str(i+k)
         strip.show()
         time.sleep(wait_ms/1000.0)
 
