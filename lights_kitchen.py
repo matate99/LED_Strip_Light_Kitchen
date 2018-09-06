@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-# NeoPixel library strandtest example
-# Author: Tony DiCola (tony@tonydicola.com)
+# NeoPixel and MQTT light functions for Raspberry Pi
+# Author: Michael Tate
+# Credit to Tony DiCola for his strandtest example in the NeoPixel library
 #
-# Direct port of the Arduino NeoPixel library strandtest example.  Showcases
-# various animations on a strip of NeoPixels.
 
 import time
 from neopixel import *
@@ -22,12 +21,13 @@ LED_INVERT     = False   # True to invert the signal (when using NPN transistor 
 LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
 MQTT_SERVER = "192.168.65.117"
-MQTT_PATH = "test_channel"
+MQTT_PATH = "kitchen_lights"
 
 mypayload = "N/A"
 breakpayload = ""
 temppayload = ""
 
+#generic color of "fire" for the candle animation. Using a float to make the randomizations smoother.
 FIRE_COLOR = [125.0,210.0,15.0,0]
 
 
@@ -103,13 +103,9 @@ def candle(strip):
                 candles_bright[i][1] = candles_bright[i][1] - 1
 
 
-        #print(candles[0])
-        #print(candles[0][0]//1)
         for y in range(0, LIGHTS, 1):
             for z in range(0, LIGHT_SIZE, 1):
                 strip.setPixelColorRGB(y*(LIGHT_SIZE + LIGHT_SPACING) + z, int(round((candles[y][0])*candles_bright[y][0])), int(round((candles[y][1]*candles_bright[y][0]))), int(round((candles[y][2]*candles_bright[y][0]))))
-        #print((candles[y][0])*candles_bright[y][0])
-        #print(candles_bright[y])
         strip.show()
 	if (mypayload == "turn_off") or (breakpayload == "turn_off"):
             break
@@ -141,7 +137,7 @@ def packer(strip):
         y = 0
         while y < LED_COUNT:
             for z in range(0, 49):
-                strip.setPixelColorRGB(((x+y+z) % LED_COUNT)+1,240,12,51)
+                strip.setPixelColorRGB(((x+y+z) % LED_COUNT)+1,173,49,38)
             for w in range(0, 49):
                 strip.setPixelColorRGB(((x+y+w+16) % LED_COUNT)+1,184,255,28)
             #print(str(((x+y+z)) % LED_COUNT) + " " + str(y))
@@ -171,17 +167,6 @@ def quickWipe(strip):
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, Color(0,0,0))
     strip.show()
-
-def theaterChase(strip, color, wait_ms=50, iterations=10):
-    """Movie theater light style chaser animation."""
-    for j in range(iterations):
-        for q in range(3):
-            for i in range(0, strip.numPixels(), 3):
-                strip.setPixelColor(i+q, color)
-            strip.show()
-            time.sleep(wait_ms/1000.0)
-            for i in range(0, strip.numPixels(), 3):
-                strip.setPixelColor(i+q, 0)
 
 def wheel(pos):
     """Generate rainbow colors across 0-255 positions."""
@@ -213,17 +198,6 @@ def rainbowCycle(strip, wait_ms=20, iterations=5):
             strip.setPixelColor(i, wheel((int(i * 256 / strip.numPixels()) + j) & 255))
         strip.show()
         time.sleep(wait_ms/1000.0)
-
-def theaterChaseRainbow(strip, wait_ms=50):
-    """Rainbow movie theater light style chaser animation."""
-    for j in range(256):
-        for q in range(3):
-            for i in range(0, strip.numPixels(), 3):
-                strip.setPixelColor(i+q, wheel((i+j) % 255))
-            strip.show()
-            time.sleep(wait_ms/1000.0)
-            for i in range(0, strip.numPixels(), 3):
-                strip.setPixelColor(i+q, 0)
 
 # Main program logic follows:
 if __name__ == '__main__':
@@ -268,20 +242,6 @@ if __name__ == '__main__':
                 quickWipe(strip)
 		candle(strip)
 		breakpayload = ""
-            #print ('Color wipe animations.')
-            #colorWipe(strip, Color(255, 0, 0))  # Red wipe
-            #colorWipe(strip, Color(0, 255, 0))  # Blue wipe
-            #colorWipe(strip, Color(0, 0, 255))  # Green wipe
-            #print ('Theater chase animations.')
-            #theaterChase(strip, Color(127, 127, 127))  # White theater chase
-            #theaterChase(strip, Color(127,   0,   0))  # Red theater chase
-            #theaterChase(strip, Color(  0,   0, 127))  # Blue theater chase
-            #print ('candle animation')
-            #candle(strip)
-            #print ('Rainbow animations.')
-            #rainbow(strip)
-            #rainbowCycle(strip)
-            #theaterChaseRainbow(strip)
 
     except KeyboardInterrupt:
         colorWipe(strip, Color(0,0,0), 10)
